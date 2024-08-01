@@ -25,7 +25,7 @@
 Клонируйте этот репозиторий на вашу локальную машину:
 
 ```bash
-git clone https://github.com/ваш_пользователь/ваш_репозиторий.git
+git clone https://github.com/Alextrp/Server.git
 ```
 
 ### Сборка проекта
@@ -65,45 +65,8 @@ git clone https://github.com/ваш_пользователь/ваш_репози
 
 2. Клиенты могут подключаться к серверу на порту 2323. При подключении и отправке запроса, сервер ответит сообщением "Заявка обработана успешно".
 
-## Примеры использования
-
-Пример кода клиента на Qt для подключения к серверу и отправки сообщения:
-
-```cpp
-#include <QCoreApplication>
-#include <QTcpSocket>
-
-int main(int argc, char *argv[])
-{
-    QCoreApplication a(argc, argv);
-
-    QTcpSocket socket;
-    socket.connectToHost("127.0.0.1", 2323);
-
-    if (socket.waitForConnected()) {
-        QByteArray data;
-        QDataStream out(&data, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_6_2);
-        out << quint16(0) << QString("Привет, сервер!");
-        out.device()->seek(0);
-        out << quint16(data.size() - sizeof(quint16));
-
-        socket.write(data);
-        socket.waitForBytesWritten();
-    }
-
-    return a.exec();
-}
-```
-
-## Лицензия
-
-Этот проект лицензирован под лицензией MIT. См. [LICENSE](LICENSE) для получения дополнительной информации.
 
 ## Контакты
 
-Если у вас есть вопросы или предложения, пожалуйста, свяжитесь со мной по адресу электронной почты: ваш_email@example.com.
+Если у вас есть вопросы или предложения, пожалуйста, свяжитесь со мной по адресу электронной почты: alex.obod82@gmail.com.
 
----
-
-Этот README файл предоставляет основную информацию о вашем проекте, включая описание, инструкции по установке, использование и примеры. Вы можете добавить или изменить разделы в зависимости от требований вашего проекта.
