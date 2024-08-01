@@ -60,7 +60,7 @@ void Server::slotReadyRead()
             in >> str;
             nextBlockSize = 0;
             qDebug() << str;
-            SendToClient("Заявка обработана успешно");
+            SendToClient("Заявка обработана успешно!");
             break;
         }
     }
