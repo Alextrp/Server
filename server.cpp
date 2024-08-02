@@ -1,4 +1,5 @@
 #include "server.h"
+#include "validation.h"
 
 Server::Server()
 {
@@ -60,7 +61,15 @@ void Server::slotReadyRead()
             in >> str;
             nextBlockSize = 0;
             qDebug() << str;
-            SendToClient("Заявка обработана успешно!");
+
+            if(checkRequest(str))
+            {
+                SendToClient("Заявка обработана успешно!");
+            }
+            else
+            {
+                SendToClient("Заявка неверная");
+            }
             break;
         }
     }
