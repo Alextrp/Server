@@ -3,6 +3,10 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QVector>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QDateTime>
+
 
 class Server : public QTcpServer
 {
