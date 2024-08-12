@@ -6,6 +6,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QDateTime>
+#include <QTimer>
+#include <anotherserver.h>
 
 
 class Server : public QTcpServer
@@ -21,6 +23,8 @@ private:
     QByteArray Data;
     void SendToClient(QString str);
     quint16 nextBlockSize;
+    QTimer *timer;
+    AnotherServer *anotherServer;
 
 public slots:
     void incomingConnection(qintptr socketDescriptor);

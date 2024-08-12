@@ -1,5 +1,6 @@
 #include "server.h"
 #include "validation.h"
+#include "anotherserver.h"
 
 Server::Server()
 {
@@ -12,6 +13,8 @@ Server::Server()
         qDebug() << "error";
     }
     nextBlockSize = 0;
+
+    anotherServer = new AnotherServer(this);
 }
 
 void Server::incomingConnection(qintptr socketDescriptor)
@@ -23,6 +26,13 @@ void Server::incomingConnection(qintptr socketDescriptor)
 
     Sockets.push_back(socket);
     qDebug() << "client connected" << socketDescriptor;
+
+    anotherServer = new AnotherServer(this);
+
+    // Создаем и настраиваем таймер
+    timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, anotherServer, &AnotherServer::requestTact);
+    timer->start(1000);
 }
 
 void Server::slotReadyRead()
