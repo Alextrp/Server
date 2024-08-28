@@ -3,8 +3,6 @@
 AnotherServer::AnotherServer(QObject *parent) : QObject(parent) {
     udpSocket = new QUdpSocket(this);
     connect(udpSocket, &QUdpSocket::readyRead, this, &AnotherServer::processPendingDatagrams);
-
-
 }
 
 void AnotherServer::requestTact(quint16 portTime) {
@@ -12,9 +10,13 @@ void AnotherServer::requestTact(quint16 portTime) {
     jsonObject["type"] = "get_tact";
 
     QJsonDocument jsonDoc(jsonObject);
-    udpSocket->writeDatagram(jsonDoc.toJson(), QHostAddress("127.0.0.1"), portTime);
+    qint64 bytesWritten = udpSocket->writeDatagram(jsonDoc.toJson(), QHostAddress("127.0.0.1"), portTime);
 
-    qDebug() << "Sent request for synchronized tact.";
+    if (bytesWritten == -1) {
+        qDebug() << "Failed to send request for synchronized tact. Error:" << udpSocket->errorString();
+    } else {
+        qDebug() << "Sent request for synchronized tact.";
+    }
 }
 
 void AnotherServer::processPendingDatagrams() {

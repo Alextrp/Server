@@ -29,6 +29,7 @@ void Server::incomingConnection(qintptr socketDescriptor)
 
     anotherServer = new AnotherServer(this);
 
+    anotherServer->requestTact(portTime);
     // Создаем и настраиваем таймер
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [this]() { anotherServer->requestTact(portTime); });
@@ -57,14 +58,14 @@ void Server::slotReadyRead() {
 
             QJsonDocument doc = QJsonDocument::fromJson(jsonString.toUtf8());
             QJsonObject json = doc.object();
-
+            anotherServer->requestTact(portTime);
             // Используем текущий такт из AnotherServer
             qint64 tactNumber = anotherServer->takt;
             json["tact_number"] = tactNumber;
 
             qDebug() << "Received JSON:";
             qDebug() << "ID:" << json["id"].toInt();
-            qDebug() << "Timestamp:" << json["timestamp"].toString();
+            qDebug() << "Timestamp:" << json["timestamp"].toInt();
             qDebug() << "Config:" << json["config"].toString();
             qDebug() << "Priority:" << json["priority"].toInt();
             qDebug() << "Min Count:" << json["min_count"].toInt();
