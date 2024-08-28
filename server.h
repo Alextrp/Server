@@ -17,6 +17,7 @@ class Server : public QTcpServer
 public:
     Server();
     QTcpSocket *socket;
+    quint16 portTime;
 
 private:
     QVector <QTcpSocket*> Sockets;
@@ -25,6 +26,7 @@ private:
     quint16 nextBlockSize;
     QTimer *timer;
     AnotherServer *anotherServer;
+
 
 public slots:
     void incomingConnection(qintptr socketDescriptor);

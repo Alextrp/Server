@@ -31,29 +31,23 @@ void Server::incomingConnection(qintptr socketDescriptor)
 
     // Создаем и настраиваем таймер
     timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, anotherServer, &AnotherServer::requestTact);
+    connect(timer, &QTimer::timeout, this, [this]() { anotherServer->requestTact(portTime); });
     timer->start(1000);
 }
 
-void Server::slotReadyRead()
-{
+void Server::slotReadyRead() {
     socket = (QTcpSocket*)sender();
     QDataStream in(socket);
     in.setVersion(QDataStream::Qt_6_2);
-    if(in.status() == QDataStream::Ok)
-    {
-        for(;;)
-        {
-            if(nextBlockSize == 0)
-            {
-                if(socket->bytesAvailable() < 2)
-                {
+    if (in.status() == QDataStream::Ok) {
+        for (;;) {
+            if (nextBlockSize == 0) {
+                if (socket->bytesAvailable() < 2) {
                     break;
                 }
                 in >> nextBlockSize;
             }
-            if(socket->bytesAvailable() < nextBlockSize)
-            {
+            if (socket->bytesAvailable() < nextBlockSize) {
                 break;
             }
 
@@ -64,29 +58,26 @@ void Server::slotReadyRead()
             QJsonDocument doc = QJsonDocument::fromJson(jsonString.toUtf8());
             QJsonObject json = doc.object();
 
-            int id = json["id"].toInt();
-            QString timestamp = json["timestamp"].toString();
-            int priority = json["priority"].toInt();
-            int minCount = json["min_count"].toInt();
-            int tactNumber = json["tact_number"].toInt();
+            // Используем текущий такт из AnotherServer
+            qint64 tactNumber = anotherServer->takt;
+            json["tact_number"] = tactNumber;
 
             qDebug() << "Received JSON:";
-            qDebug() << "ID:" << id;
-            qDebug() << "Timestamp:" << timestamp;
-            qDebug() << "Priority:" << priority;
-            qDebug() << "Min Count:" << minCount;
+            qDebug() << "ID:" << json["id"].toInt();
+            qDebug() << "Timestamp:" << json["timestamp"].toString();
+            qDebug() << "Config:" << json["config"].toString();
+            qDebug() << "Priority:" << json["priority"].toInt();
+            qDebug() << "Min Count:" << json["min_count"].toInt();
             qDebug() << "Tact Number:" << tactNumber;
 
-            QString response = checkRequest(jsonString) ? "Заявка обработана успешно!" : "Заявка неверная";
-            SendToClient(jsonString);
+            SendToClient(QJsonDocument(json).toJson());
             break;
         }
-    }
-    else
-    {
+    } else {
         qDebug() << "DataStream error";
     }
 }
+
 
 void Server::SendToClient(QString str)
 {

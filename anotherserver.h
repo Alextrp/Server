@@ -14,7 +14,9 @@ class AnotherServer : public QObject {
 public:
     explicit AnotherServer(QObject *parent = nullptr);
 
-    void requestTact();
+    void requestTact(quint16 portTime);
+    qint64 takt;
+
 
 private slots:
     void processPendingDatagrams();

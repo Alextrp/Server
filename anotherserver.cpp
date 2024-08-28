@@ -4,15 +4,15 @@ AnotherServer::AnotherServer(QObject *parent) : QObject(parent) {
     udpSocket = new QUdpSocket(this);
     connect(udpSocket, &QUdpSocket::readyRead, this, &AnotherServer::processPendingDatagrams);
 
-    requestTact();
+
 }
 
-void AnotherServer::requestTact() {
+void AnotherServer::requestTact(quint16 portTime) {
     QJsonObject jsonObject;
     jsonObject["type"] = "get_tact";
 
     QJsonDocument jsonDoc(jsonObject);
-    udpSocket->writeDatagram(jsonDoc.toJson(), QHostAddress("127.0.0.1"), 45454);
+    udpSocket->writeDatagram(jsonDoc.toJson(), QHostAddress("127.0.0.1"), portTime);
 
     qDebug() << "Sent request for synchronized tact.";
 }
@@ -25,7 +25,6 @@ void AnotherServer::processPendingDatagrams() {
 
         qint64 syncedTact = jsonObject["tact"].toVariant().toLongLong();
         qDebug() << "Received synchronized tact:" << syncedTact;
-
-        // Дополнительная логика работы с синхронизированным тактом
+        takt = syncedTact;
     }
 }
