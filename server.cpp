@@ -58,6 +58,9 @@ void Server::slotReadyRead() {
 
             QJsonDocument doc = QJsonDocument::fromJson(jsonString.toUtf8());
             QJsonObject json = doc.object();
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(8000));
+
             anotherServer->requestTact(portTime);
             // Используем текущий такт из AnotherServer
             qint64 tactNumber = anotherServer->takt;

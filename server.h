@@ -7,6 +7,7 @@
 #include <QJsonObject>
 #include <QDateTime>
 #include <QTimer>
+#include <thread>
 #include <anotherserver.h>
 
 
