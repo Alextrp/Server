@@ -4,16 +4,12 @@
 
 Server::Server()
 {
-    if(this->listen(QHostAddress::Any,2323))
-    {
-        qDebug() << "Server start";
-    }
-    else
-    {
-        qDebug() << "error";
+    if (this->listen(QHostAddress::Any, 2323)) {
+        qDebug() << "Server started on port 2323";
+    } else {
+        qDebug() << "Error starting server";
     }
     nextBlockSize = 0;
-
     anotherServer = new AnotherServer(this);
 }
 
@@ -25,19 +21,20 @@ void Server::incomingConnection(qintptr socketDescriptor)
     connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);
 
     Sockets.push_back(socket);
-    qDebug() << "client connected" << socketDescriptor;
+    qDebug() << "Client connected with descriptor" << socketDescriptor;
 
     anotherServer = new AnotherServer(this);
 
     anotherServer->requestTact(portTime);
-    // Создаем и настраиваем таймер
+
+    // Таймер для регулярного запроса тактов
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [this]() { anotherServer->requestTact(portTime); });
-    timer->start(1000);
+    timer->start(1000);  // Запрашиваем такты каждую секунду
 }
 
 void Server::slotReadyRead() {
-    socket = (QTcpSocket*)sender();
+    socket = static_cast<QTcpSocket*>(sender());
     QDataStream in(socket);
     in.setVersion(QDataStream::Qt_6_2);
     if (in.status() == QDataStream::Ok) {
@@ -59,10 +56,7 @@ void Server::slotReadyRead() {
             QJsonDocument doc = QJsonDocument::fromJson(jsonString.toUtf8());
             QJsonObject json = doc.object();
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(8000));
-
             anotherServer->requestTact(portTime);
-            // Используем текущий такт из AnotherServer
             qint64 tactNumber = anotherServer->takt;
             json["tact_number"] = tactNumber;
 
@@ -82,26 +76,16 @@ void Server::slotReadyRead() {
     }
 }
 
-
 void Server::SendToClient(QString str)
 {
-    /*QJsonObject json;
-    json["response"] = str;
-
-    QJsonDocument doc(json);
-    QString jsonString = doc.toJson(QJsonDocument::Compact);*/
-
     Data.clear();
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_2);
     out << quint16(0) << str;
     out.device()->seek(0);
-    out << quint16(Data.size()-sizeof(quint16));
+    out << quint16(Data.size() - sizeof(quint16));
 
-    //socket->write(Data);
-    for(int i = 0; i < Sockets.size(); i++)
-    {
+    for (int i = 0; i < Sockets.size(); i++) {
         Sockets[i]->write(Data);
     }
 }
-
