@@ -14,10 +14,18 @@ void AnotherServer::requestTact(quint16 portTime) {
 
     if (bytesWritten == -1) {
         qDebug() << "Failed to send request for synchronized tact. Error:" << udpSocket->errorString();
-        takt = QDateTime::currentSecsSinceEpoch();
+        //takt = QDateTime::currentSecsSinceEpoch();
     } else {
         qDebug() << "Sent request for synchronized tact.";
-        takt = QDateTime::currentSecsSinceEpoch();
+        //takt = QDateTime::currentSecsSinceEpoch();
+        if (jsonObject.contains("tact")) {
+            quint64 syncedTact = jsonObject["tact"].toVariant().toLongLong();
+            qDebug() << "Received synchronized tact:" << syncedTact;
+            takt = syncedTact;
+        } else {
+            qDebug() << "Received unexpected data:" ;
+            //takt = QDateTime::currentSecsSinceEpoch();
+        }
     }
 }
 
@@ -28,12 +36,12 @@ void AnotherServer::processPendingDatagrams() {
         QJsonObject jsonObject = jsonDoc.object();
 
         if (jsonObject.contains("tact")) {
-            qint64 syncedTact = jsonObject["tact"].toVariant().toLongLong();
+            quint64 syncedTact = jsonObject["tact"].toVariant().toLongLong();
             qDebug() << "Received synchronized tact:" << syncedTact;
             takt = syncedTact;
         } else {
             qDebug() << "Received unexpected data:" << datagram.data();
-            takt = QDateTime::currentSecsSinceEpoch();
+            //takt = QDateTime::currentSecsSinceEpoch();
         }
     }
 }

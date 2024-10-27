@@ -15,10 +15,10 @@ public:
     explicit AnotherServer(QObject *parent = nullptr);
 
     void requestTact(quint16 portTime);
-    qint64 takt;
+    quint64 takt;
 
 
-private slots:
+public slots:
     void processPendingDatagrams();
 
 private:

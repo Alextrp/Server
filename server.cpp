@@ -57,12 +57,13 @@ void Server::slotReadyRead() {
             QJsonObject json = doc.object();
 
             anotherServer->requestTact(portTime);
-            qint64 tactNumber = anotherServer->takt;
-            json["tact_number"] = tactNumber;
+            quint64 tactNumber = anotherServer->takt;
+            json["tact_number"] = static_cast<qint64>(tactNumber);
+
 
             qDebug() << "Received JSON:";
             qDebug() << "ID:" << json["id"].toInt();
-            qDebug() << "Timestamp:" << json["timestamp"].toInt();
+            qDebug() << "Timestamp:" << json["timestamp"].toVariant().toULongLong();
             qDebug() << "Config:" << json["config"].toString();
             qDebug() << "Priority:" << json["priority"].toInt();
             qDebug() << "Min Count:" << json["min_count"].toInt();
